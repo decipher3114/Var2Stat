@@ -1,0 +1,167 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://github.com/decipher3114/Var2Stat",
+    "title": "Var2Stat Configuration",
+    "description": "Configuration schema for generating static fonts from variable fonts",
+    "type": "object",
+    "required": [
+        "file",
+        "font_name",
+        "axes",
+        "variants"
+    ],
+    "definitions": {
+        "axes": {
+            "type": "object",
+            "properties": {
+                "wght": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "minimum": 1,
+                    "maximum": 1000,
+                    "description": "Weight axis (1-1000, typically 100-900)"
+                },
+                "wdth": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "minimum": 25,
+                    "maximum": 200,
+                    "description": "Width axis (25-200%, typically 50-200)"
+                },
+                "opsz": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "minimum": 6,
+                    "maximum": 144,
+                    "description": "Optical size axis (6-144pt)"
+                },
+                "slnt": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "minimum": -90,
+                    "maximum": 90,
+                    "description": "Slant axis (-90° to 90°)"
+                },
+                "ital": {
+                    "anyOf": [
+                        {
+                            "enum": [
+                                0,
+                                1
+                            ]
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "description": "Italic axis (0=roman, 1=italic)"
+                },
+                "GRAD": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "minimum": -200,
+                    "maximum": 300,
+                    "description": "Grade axis (-200 to 300)"
+                },
+                "ROND": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "Roundness axis"
+                },
+                "CASL": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "Casual axis"
+                },
+                "CRSV": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "Cursive axis"
+                },
+                "MONO": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "Monospace axis"
+                },
+                "SOFT": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "Softness axis"
+                },
+                "WONK": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "Wonky axis"
+                }
+            },
+            "additionalProperties": {
+                "type": [
+                    "number",
+                    "null"
+                ],
+                "description": "Custom axis value"
+            }
+        }
+    },
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON schema reference"
+        },
+        "file": {
+            "type": "string",
+            "description": "Path to the variable font file",
+            "pattern": "\\.(ttf|otf)$"
+        },
+        "font_name": {
+            "type": [
+                "string",
+                "null"
+            ],
+            "description": "Target font family name for generated static fonts"
+        },
+        "axes": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/axes"
+                }
+            ],
+            "description": "Global axis default values for all variants"
+        },
+        "variants": {
+            "type": "object",
+            "description": "Static font variants to generate keys",
+            "minProperties": 1,
+            "patternProperties": {
+                "^[a-zA-Z0-9_-]+$": {
+                    "$ref": "#/definitions/axes",
+                    "description": "Variant-specific axis values"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}
