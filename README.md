@@ -35,25 +35,25 @@ Convert variable fonts to static font instances with configuration-based axis co
    uv sync
    ```
 
-### Running the Scripts
+### Generate Fonts
 
-- **Step 1**: Generate config from variable font (creates `{FontName}-config.json`):
+1. **Generate config from variable font** (creates `{FontName}-config.json`):
 
-  ```bash
-  uv run dump_config.py <font_file.ttf>
-  ```
+   ```bash
+   uv run dump_config.py <font_file.ttf>
+   ```
 
-- **Step 2**: Generate static fonts:
+2. **Generate static fonts**:
 
-  ```bash
-  uv run generate_fonts.py <config_file.json>
-  ```
+   ```bash
+   uv run generate_fonts.py <config_file.json>
+   ```
 
-  Optional: Specify output directory with `--output` or `-o`
+   Optional: Specify output directory with `--output` or `-o`
 
-  ```bash
-  uv run generate_fonts.py <config_file.json> --output fonts
-  ```
+   ```bash
+   uv run generate_fonts.py <config_file.json> --output fonts
+   ```
 
 ## Config Structure
 
