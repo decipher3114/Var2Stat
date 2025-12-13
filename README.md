@@ -10,23 +10,50 @@ Convert variable fonts to static font instances with configuration-based axis co
 
 ## Usage
 
-- **Step 1**: Generate config from variable font (creates `{FontName}-config.json`):
+### Setup
 
-  ```bash
-  uv run dump_config.py <font_file.ttf>
-  ```
+1. **Install uv**:
 
-- **Step 2**: Generate static fonts:
+   Follow the installation instructions at [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
 
-  ```bash
-  uv run generate_fonts.py <config_file.json>
-  ```
+2. **Clone the repository**:
 
-  Optional: Specify output directory with `--output` or `-o`
+   ```bash
+   git clone https://github.com/decipher3114/Var2Stat.git
+   cd Var2Stat
+   ```
 
-  ```bash
-  uv run generate_fonts.py <config_file.json> --output fonts
-  ```
+3. **Create a virtual environment**:
+
+   ```bash
+   uv venv
+   ```
+
+4. **Sync dependencies**:
+
+   ```bash
+   uv sync
+   ```
+
+### Generate Fonts
+
+1. **Generate config from variable font** (creates `{FontName}-config.json`):
+
+   ```bash
+   uv run dump_config.py <font_file.ttf>
+   ```
+
+2. **Generate static fonts**:
+
+   ```bash
+   uv run generate_fonts.py <config_file.json>
+   ```
+
+   Optional: Specify output directory with `--output` or `-o`
+
+   ```bash
+   uv run generate_fonts.py <config_file.json> --output fonts
+   ```
 
 ## Config Structure
 
