@@ -10,6 +10,33 @@ Convert variable fonts to static font instances with configuration-based axis co
 
 ## Usage
 
+### Setup
+
+1. **Install uv**:
+
+   Follow the installation instructions at [https://docs.astral.sh/uv/getting-started/installation/](https://docs.astral.sh/uv/getting-started/installation/)
+
+2. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/decipher3114/Var2Stat.git
+   cd Var2Stat
+   ```
+
+3. **Create a virtual environment**:
+
+   ```bash
+   uv venv
+   ```
+
+4. **Sync dependencies**:
+
+   ```bash
+   uv sync
+   ```
+
+### Running the Scripts
+
 - **Step 1**: Generate config from variable font (creates `{FontName}-config.json`):
 
   ```bash
