@@ -8,17 +8,23 @@ Convert variable fonts to static font instances with configuration-based axis co
 - Smart axis inheritance (global defaults with variant overrides)
 - True static output with all variation tables removed
 
+## Installation
+
+```bash
+uv tool install var2stat
+```
+
 ## Usage
 
-- **Step 1**: Generate config from variable font (creates `{FontName}-config.json` in the same directory as the font):
+- **Step 1**: Generate config from variable font (creates `<font_file>-config.json` in the same directory as the font):
 
-  ```/dev/null/usage.sh#L1-1
+  ```bash
   uvx var2stat config <font_file.ttf>
   ```
 
 - **Step 2**: Generate static fonts from a config file:
 
-  ```/dev/null/usage.sh#L1-1
+  ```bash
   uvx var2stat generate <config_file.json>
   ```
 
