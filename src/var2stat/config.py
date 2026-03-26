@@ -2,12 +2,12 @@
 
 import json
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 import click
 from fontTools.ttLib import TTFont
 
-SCHEMA = "schema.json"
+SCHEMA = "https://raw.githubusercontent.com/decipher3114/Var2Stat/refs/heads/main/schema.json"
 
 
 def extract_font_info(font_path: str) -> Dict[str, Any]:
@@ -108,7 +108,7 @@ def create_config_structure(font_info: Dict[str, Any]) -> Dict[str, Any]:
         optimized_variants[variant_name] = optimized_variant
 
     return {
-        "$schema": f"./{SCHEMA}",
+        "$schema": SCHEMA,
         "file": font_info["font_path"],
         "font_name": font_info["font_name"],
         "axes": global_axes,
@@ -116,9 +116,9 @@ def create_config_structure(font_info: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-@click.command()
+@click.command("config")
 @click.argument("font_file", type=str)
-def main(font_file: str) -> None:
+def config_command(font_file: str) -> None:
     """Generate configuration file for variable font.
 
     FONT_FILE: Path to the variable font file (.ttf or .otf)
@@ -139,7 +139,3 @@ def main(font_file: str) -> None:
     except Exception as e:
         print(f"[ERROR]: {e}")
         raise click.Abort()
-
-
-if __name__ == "__main__":
-    main()

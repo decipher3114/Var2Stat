@@ -10,28 +10,25 @@ Convert variable fonts to static font instances with configuration-based axis co
 
 ## Usage
 
-- **Step 1**: Generate config from variable font (creates `{FontName}-config.json`):
+- **Step 1**: Generate config from variable font (creates `{FontName}-config.json` in the same directory as the font):
 
-  ```bash
-  uv run dump_config.py <font_file.ttf>
+  ```/dev/null/usage.sh#L1-1
+  uvx var2stat config <font_file.ttf>
   ```
 
-- **Step 2**: Generate static fonts:
+- **Step 2**: Generate static fonts from a config file:
 
-  ```bash
-  uv run generate_fonts.py <config_file.json>
+  ```/dev/null/usage.sh#L1-1
+  uvx var2stat generate <config_file.json>
   ```
 
-  Optional: Specify output directory with `--output` or `-o`
-
-  ```bash
-  uv run generate_fonts.py <config_file.json> --output fonts
-  ```
+  Output is always saved to a folder named after the canonicalized font name, with files named `<canonical_font_name>_<variant>.ttf`.
 
 ## Config Structure
 
 ```json
 {
+  "$schema": "https://raw.githubusercontent.com/decipher3114/Var2Stat/refs/heads/main/schema.json",
   "file": "font.ttf",
   "font_name": "Font Name",
   "axes": { "wght": null, "opsz": 16 },
@@ -44,4 +41,3 @@ Convert variable fonts to static font instances with configuration-based axis co
 
 - Global axes with `null` use font defaults
 - Variant axes override global values
-- Output saved to `output/` directory (or specified directory)

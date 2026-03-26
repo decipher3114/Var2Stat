@@ -8,10 +8,3 @@ wheels/
 
 # Virtual environments
 .venv
-
-# Generated files and folders
-*.json
-!schema.json
-output/
-*.ttf
-*.otf

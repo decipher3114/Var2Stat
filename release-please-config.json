@@ -1,0 +1,10 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "packages": {
+        ".": {
+            "package-name": "var2stat"
+        }
+    },
+    "include-v-in-release-name": true,
+    "release-type": "python"
+}
