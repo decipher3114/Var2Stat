@@ -51,6 +51,19 @@ def remove_variation_tables(font: TTFont) -> None:
             del font[table]
 
 
+def canonicalize_font_name(font_name: str) -> str:
+    # Create a canonical font name suitable for filenames/directories:
+    # - replace invalid path characters with "_"
+    # - remove spaces
+    # - fallback to "Font" if empty
+    canonical_font_name = "".join(
+        ch if ch not in '<>:"/\\|?*' else "_" for ch in font_name
+    ).replace(" ", "").strip()
+    if not canonical_font_name:
+        canonical_font_name = "Font"
+    return canonical_font_name
+
+
 def update_font_names(
     font: TTFont, font_name: str, variant_name: str, axes: Dict[str, Union[int, float]]
 ) -> None:
@@ -138,11 +151,7 @@ def generate_variant(
         update_font_names(static_font, font_name, variant_name, resolved_axes)
 
         # Save font
-        canonical_font_name = "".join(
-            ch if ch not in '<>:"/\\|?*' else "_" for ch in font_name
-        ).strip()
-        if not canonical_font_name:
-            canonical_font_name = "Font"
+        canonical_font_name = canonicalize_font_name(font_name)
         output_filename = f"{canonical_font_name}_{variant_name}.ttf"
         static_font.save(os.path.join(output_folder, output_filename))
 
@@ -154,13 +163,9 @@ def generate_variant(
 
 
 def resolve_output_directory(font_name: str) -> str:
-    sanitized_font_name = "".join(
-        ch if ch not in '<>:"/\\|?*' else "_" for ch in font_name
-    ).strip()
-    if not sanitized_font_name:
-        sanitized_font_name = "Font"
-    os.makedirs(sanitized_font_name, exist_ok=True)
-    return sanitized_font_name
+    canonical_font_name = canonicalize_font_name(font_name)
+    os.makedirs(canonical_font_name, exist_ok=True)
+    return canonical_font_name
 
 
 def generate_from_config(config_path: str) -> None:
