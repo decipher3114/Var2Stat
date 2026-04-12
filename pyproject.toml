@@ -1,6 +1,6 @@
 [project]
 name            = "var2stat"
-version         = "0.1.0"
+version         = "0.1.1"
 description     = "Convert variable fonts to static font instances"
 readme          = "README.md"
 requires-python = ">=3.14"
