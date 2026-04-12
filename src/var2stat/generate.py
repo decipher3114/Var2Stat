@@ -64,6 +64,15 @@ def canonicalize_font_name(font_name: str) -> str:
     return canonical_font_name
 
 
+def encode(record, text: str) -> bytes:
+    # platform-aware encoding
+    if record.platformID == 3:  # Windows
+        return text.encode("utf-16-be")
+    elif record.platformID == 1:  # Mac
+        return text.encode("mac_roman", errors="ignore")
+    else:
+        return text.encode("utf-16-be")
+
 def update_font_names(
     font: TTFont, font_name: str, variant_name: str, axes: Dict[str, Union[int, float]]
 ) -> None:
@@ -72,21 +81,23 @@ def update_font_names(
     weight_value = axes.get("wght", 400)
 
     for record in name_table.names:
-        if record.platformID == 3 and record.platEncID == 1:
-            if record.nameID == 1:  # Family name
-                record.string = font_name.encode("utf-16-be")
-            elif record.nameID == 2:  # Subfamily name
-                record.string = variant_name.encode("utf-16-be")
-            elif record.nameID == 4:  # Full name
-                full_name = (
-                    font_name
-                    if variant_name == "Regular"
-                    else f"{font_name} {variant_name}"
-                )
-                record.string = full_name.encode("utf-16-be")
-            elif record.nameID == 6:  # PostScript name
-                ps_name = f"{font_name.replace(' ', '')}-{variant_name}"
-                record.string = ps_name.encode("utf-16-be")
+        if record.nameID in {1, 16}:  # Family + Typographic Family
+            record.string = encode(record, font_name)
+
+        elif record.nameID in {2, 17}:  # Subfamily + Typographic Subfamily
+            record.string = encode(record, variant_name)
+
+        elif record.nameID == 4:  # Full name
+            full_name = (
+                font_name
+                if variant_name == "Regular"
+                else f"{font_name} {variant_name}"
+            )
+            record.string = encode(record, full_name)
+
+        elif record.nameID == 6:  # PostScript name
+            ps_name = f"{font_name.replace(' ', '')}-{variant_name}"
+            record.string = encode(record, ps_name)
 
     # Update OS/2 weight class
     if "OS/2" in font:
