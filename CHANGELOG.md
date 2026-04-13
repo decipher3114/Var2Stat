@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/decipher3114/Var2Stat/compare/var2stat-v0.1.1...var2stat-v0.2.0) (2026-04-13)
+
+
+### Features
+
+* italic font detection ([e6ec334](https://github.com/decipher3114/Var2Stat/commit/e6ec3348e7f62d45351ca8c97ca58f872e589f1b))
+
 ## [0.1.1](https://github.com/decipher3114/Var2Stat/compare/var2stat-v0.1.0...var2stat-v0.1.1) (2026-04-12)
 
 
