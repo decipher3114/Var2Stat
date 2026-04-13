@@ -9,6 +9,49 @@ from fontTools.ttLib import TTFont
 
 SCHEMA = "https://raw.githubusercontent.com/decipher3114/Var2Stat/refs/heads/main/schema.json"
 
+WEIGHT_NAMES: Dict[int, str] = {
+    100: "Thin",
+    200: "ExtraLight",
+    300: "Light",
+    400: "Regular",
+    500: "Medium",
+    600: "SemiBold",
+    700: "Bold",
+    800: "ExtraBold",
+    900: "Black",
+}
+
+
+def is_hardcoded_italic(font: TTFont, family_name: str) -> bool:
+    """Check if font is hardcoded italic (no ital axis but styled as italic)."""
+    has_ital_axis = any(axis.axisTag == "ital" for axis in font["fvar"].axes)
+    if has_ital_axis:
+        return False
+
+    family_name_italic = "italic" in family_name.lower()
+    post_italic = "post" in font and font["post"].italicAngle != 0
+    return family_name_italic or post_italic
+
+
+def get_instance_name(
+    coordinates: Dict[str, Any],
+    index: int,
+    hardcoded_italic: bool,
+) -> str:
+    """Generate descriptive variant name from instance coordinates."""
+    if "wght" in coordinates:
+        weight_value = coordinates["wght"]
+        if weight_value in WEIGHT_NAMES:
+            base_name = WEIGHT_NAMES[weight_value]
+        else:
+            closest = min(WEIGHT_NAMES.keys(), key=lambda x: abs(x - weight_value))
+            base_name = f"{WEIGHT_NAMES[closest]}{int(weight_value)}"
+    else:
+        base_name = f"Instance{index + 1}"
+
+    italic = hardcoded_italic or coordinates.get("ital") == 1
+    return f"{base_name} Italic" if italic else base_name
+
 
 def extract_font_info(font_path: str) -> Dict[str, Any]:
     font_path_obj = Path(font_path).resolve()
@@ -32,39 +75,16 @@ def extract_font_info(font_path: str) -> Dict[str, Any]:
         if not original_font_name:
             original_font_name = font_path_obj.stem
 
+        hardcoded_italic = is_hardcoded_italic(font, original_font_name)
+
         # Process axis defaults
         axes_defaults = {axis.axisTag: axis.defaultValue for axis in font["fvar"].axes}
 
         # Process available instances
         variants = {}
-        weight_names = {
-            100: "Thin",
-            200: "ExtraLight",
-            300: "Light",
-            400: "Regular",
-            500: "Medium",
-            600: "SemiBold",
-            700: "Bold",
-            800: "ExtraBold",
-            900: "Black",
-        }
-
         for i, instance in enumerate(font["fvar"].instances):
             coordinates = dict(instance.coordinates)
-
-            # Generate descriptive name from weight
-            if "wght" in coordinates:
-                weight_value = coordinates["wght"]
-                if weight_value in weight_names:
-                    instance_name = weight_names[weight_value]
-                else:
-                    closest = min(
-                        weight_names.keys(), key=lambda x: abs(x - weight_value)
-                    )
-                    instance_name = f"{weight_names[closest]}{int(weight_value)}"
-            else:
-                instance_name = f"Instance{i + 1}"
-
+            instance_name = get_instance_name(coordinates, i, hardcoded_italic)
             variants[instance_name] = coordinates
 
         return {
