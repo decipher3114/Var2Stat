@@ -7,7 +7,8 @@ from typing import Any, Dict
 import click
 from fontTools.ttLib import TTFont
 
-SCHEMA = "https://raw.githubusercontent.com/decipher3114/Var2Stat/refs/heads/main/schema.json"
+SCHEMA_URL = "https://raw.githubusercontent.com/decipher3114/Var2Stat/refs/heads/main/var2stat/src/schema.json"
+_SCHEMA_PATH = Path(__file__).resolve().with_name("schema.json")
 
 WEIGHT_NAMES: Dict[int, str] = {
     100: "Thin",
@@ -128,7 +129,7 @@ def create_config_structure(font_info: Dict[str, Any]) -> Dict[str, Any]:
         optimized_variants[variant_name] = optimized_variant
 
     return {
-        "$schema": SCHEMA,
+        "$schema": SCHEMA_URL,
         "file": font_info["font_path"],
         "font_name": font_info["font_name"],
         "axes": global_axes,

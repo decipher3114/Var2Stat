@@ -2,15 +2,14 @@
 
 import json
 import os
+import re
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict
 
 import click
 import jsonschema
 from fontTools.ttLib import TTFont
 from fontTools.varLib import instancer
-
-SCHEMA_URL = "https://raw.githubusercontent.com/decipher3114/Var2Stat/refs/heads/main/schema.json"
 
 
 def load_config(config_path: str) -> Dict[str, Any]:
@@ -24,20 +23,20 @@ def load_config(config_path: str) -> Dict[str, Any]:
     except json.JSONDecodeError as e:
         raise ValueError(f"Invalid JSON syntax at line {e.lineno}, column {e.colno}")
 
-    # Validate against schema if available
-    schema_ref = config_data.get("$schema")
-    if schema_ref == SCHEMA_URL and os.path.exists("schema.json"):
-        try:
-            with open("schema.json", "r", encoding="utf-8") as f:
-                schema = json.load(f)
-            jsonschema.validate(config_data, schema)
-            print("[INFO]: Config validated")
-        except jsonschema.ValidationError as e:
-            error_msg = e.message
-            if e.absolute_path:
-                path_str = " -> ".join(str(p) for p in e.absolute_path)
-                error_msg += f" at {path_str}"
-            raise ValueError(error_msg)
+    # Validate against the packaged schema.
+    schema_path = Path(__file__).resolve().with_name("schema.json")
+    with open(schema_path, "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    try:
+        jsonschema.validate(config_data, schema)
+        print("[INFO]: Config validated against schema")
+    except jsonschema.ValidationError as e:
+        error_msg = e.message
+        if e.absolute_path:
+            path_str = " -> ".join(str(p) for p in e.absolute_path)
+            error_msg += f" at {path_str}"
+        raise ValueError(error_msg)
 
     return config_data
 
@@ -51,17 +50,22 @@ def remove_variation_tables(font: TTFont) -> None:
             del font[table]
 
 
+_CANONICAL_FILENAME_RE = re.compile(r"[^0-9A-Za-z]+")
+
+
+def canonicalize_name_for_filename(value: str, fallback: str) -> str:
+    # Convert all non-alphanumeric characters (including spaces) into '_',
+    # and collapse runs via the regex '+'.
+    canonical = _CANONICAL_FILENAME_RE.sub("_", (value or "").strip()).strip("_")
+    return canonical or fallback
+
+
 def canonicalize_font_name(font_name: str) -> str:
-    # Create a canonical font name suitable for filenames/directories:
-    # - replace invalid path characters with "_"
-    # - remove spaces
-    # - fallback to "Font" if empty
-    canonical_font_name = "".join(
-        ch if ch not in '<>:"/\\|?*' else "_" for ch in font_name
-    ).replace(" ", "").strip()
-    if not canonical_font_name:
-        canonical_font_name = "Font"
-    return canonical_font_name
+    return canonicalize_name_for_filename(font_name, fallback="Font")
+
+
+def canonicalize_variant(variant: str) -> str:
+    return canonicalize_name_for_filename(variant, fallback="Variant")
 
 
 def encode(record, text: str) -> bytes:
@@ -73,8 +77,9 @@ def encode(record, text: str) -> bytes:
     else:
         return text.encode("utf-16-be")
 
+
 def update_font_names(
-    font: TTFont, font_name: str, variant_name: str, axes: Dict[str, Union[int, float]]
+    font: TTFont, font_name: str, variant_name: str, axes: Dict[str, float | int]
 ) -> None:
     # Update font metadata and naming information
     name_table = font["name"]
@@ -134,8 +139,8 @@ def generate_variant(
     font: TTFont,
     font_name: str,
     variant_name: str,
-    variant_config: Dict[str, Union[int, float]],
-    global_axes: Dict[str, Optional[Union[int, float]]],
+    variant_config: Dict[str, float | int],
+    global_axes: Dict[str, float | int | None],
     font_defaults: Dict[str, float],
     output_folder: str,
 ) -> bool:
@@ -163,7 +168,8 @@ def generate_variant(
 
         # Save font
         canonical_font_name = canonicalize_font_name(font_name)
-        output_filename = f"{canonical_font_name}_{variant_name}.ttf"
+        canonical_variant_name = canonicalize_variant(variant_name)
+        output_filename = f"{canonical_font_name}_{canonical_variant_name}.ttf"
         static_font.save(os.path.join(output_folder, output_filename))
 
         return True
