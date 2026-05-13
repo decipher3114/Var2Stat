@@ -2,7 +2,6 @@
 
 import json
 import os
-import re
 from pathlib import Path
 from typing import Any, Dict
 
@@ -50,22 +49,14 @@ def remove_variation_tables(font: TTFont) -> None:
             del font[table]
 
 
-_CANONICAL_FILENAME_RE = re.compile(r"[^0-9A-Za-z]+")
+def canonicalize(value: str, fallback: str) -> str:
+    """Canonicalize a string for filenames/PostScript names.
 
+    Removes all non-alphabetic characters (spaces, '-', '_', digits, punctuation, etc.).
+    """
 
-def canonicalize_name_for_filename(value: str, fallback: str) -> str:
-    # Convert all non-alphanumeric characters (including spaces) into '_',
-    # and collapse runs via the regex '+'.
-    canonical = _CANONICAL_FILENAME_RE.sub("_", (value or "").strip()).strip("_")
+    canonical = "".join(ch for ch in (value or "").strip() if ch.isalpha())
     return canonical or fallback
-
-
-def canonicalize_font_name(font_name: str) -> str:
-    return canonicalize_name_for_filename(font_name, fallback="Font")
-
-
-def canonicalize_variant(variant: str) -> str:
-    return canonicalize_name_for_filename(variant, fallback="Variant")
 
 
 def encode(record, text: str) -> bytes:
@@ -101,7 +92,7 @@ def update_font_names(
             record.string = encode(record, full_name)
 
         elif record.nameID == 6:  # PostScript name
-            ps_name = f"{font_name.replace(' ', '')}-{variant_name}"
+            ps_name = f"{canonicalize(font_name, 'Font')}-{canonicalize(variant_name, 'Variant')}"
             record.string = encode(record, ps_name)
 
     # Update OS/2 weight class
@@ -167,9 +158,9 @@ def generate_variant(
         update_font_names(static_font, font_name, variant_name, resolved_axes)
 
         # Save font
-        canonical_font_name = canonicalize_font_name(font_name)
-        canonical_variant_name = canonicalize_variant(variant_name)
-        output_filename = f"{canonical_font_name}_{canonical_variant_name}.ttf"
+        canonical_font_name = canonicalize(font_name, fallback="Font")
+        canonical_variant_name = canonicalize(variant_name, fallback="Variant")
+        output_filename = f"{canonical_font_name}-{canonical_variant_name}.ttf"
         static_font.save(os.path.join(output_folder, output_filename))
 
         return True
@@ -180,7 +171,7 @@ def generate_variant(
 
 
 def resolve_output_directory(font_name: str) -> str:
-    canonical_font_name = canonicalize_font_name(font_name)
+    canonical_font_name = canonicalize(font_name, fallback="Font")
     os.makedirs(canonical_font_name, exist_ok=True)
     return canonical_font_name
 
