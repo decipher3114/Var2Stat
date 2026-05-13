@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/decipher3114/Var2Stat/compare/var2stat-v0.2.1...var2stat-v0.2.2) (2026-05-13)
+
+
+### Bug Fixes
+
+* use standard naming convention ([48697b2](https://github.com/decipher3114/Var2Stat/commit/48697b204f2c4f58cdfae5e1d9f4e971673b9c07))
+
 ## [0.2.1](https://github.com/decipher3114/Var2Stat/compare/var2stat-v0.2.0...var2stat-v0.2.1) (2026-05-13)
 
 
