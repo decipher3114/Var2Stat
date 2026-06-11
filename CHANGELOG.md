@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/decipher3114/Var2Stat/compare/var2stat-v0.2.2...var2stat-v0.2.3) (2026-06-11)
+
+
+### Bug Fixes
+
+* use correct url for schema ([e263cc3](https://github.com/decipher3114/Var2Stat/commit/e263cc38b17dc8720e147f36dfe8f692a8abb490))
+
 ## [0.2.2](https://github.com/decipher3114/Var2Stat/compare/var2stat-v0.2.1...var2stat-v0.2.2) (2026-05-13)
 
 
