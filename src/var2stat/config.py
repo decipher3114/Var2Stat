@@ -7,7 +7,7 @@ from typing import Any, Dict
 import click
 from fontTools.ttLib import TTFont
 
-SCHEMA_URL = "https://raw.githubusercontent.com/decipher3114/Var2Stat/refs/heads/main/var2stat/src/schema.json"
+SCHEMA_URL = "https://raw.githubusercontent.com/decipher3114/Var2Stat/refs/heads/main/src/var2stat/schema.json"
 _SCHEMA_PATH = Path(__file__).resolve().with_name("schema.json")
 
 WEIGHT_NAMES: Dict[int, str] = {
